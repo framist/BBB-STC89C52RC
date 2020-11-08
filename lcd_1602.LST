@@ -1,0 +1,183 @@
+C51 COMPILER V9.52.0.0   LCD_1602                                                          08/22/2019 11:35:34 PAGE 1   
+
+
+C51 COMPILER V9.52.0.0, COMPILATION OF MODULE LCD_1602
+OBJECT MODULE PLACED IN .\hex\lcd_1602.obj
+COMPILER INVOKED BY: D:\Keil\C51\BIN\C51.EXE lcd_1602.c BROWSE DEBUG OBJECTEXTEND TABS(2) OBJECT(.\hex\lcd_1602.obj)
+
+line level    source
+
+   1          #include <reg52.h>
+   2          #include <intrins.h>
+   3          #include "delay.h"
+   4          #include "lcd_1602.h"
+   5          #include <intrins.h>
+   6          
+   7          char local_date=0,base_date=0;//全局变量，当前箭头位置
+   8          
+   9          unsigned char code *Main_Menu[]=
+  10          {
+  11          {"  指纹识别系统"},
+  12          {"  1.添加指纹"},
+  13          {"  2.搜索指纹"},
+  14          {"  3.清空指纹库"}
+  15          };
+  16          
+  17          
+  18          /***********************************************
+  19          函数名称：Delay_us
+  20          功    能：STC 1T单片机1us延时程序
+  21          入口参数：us:延时的微秒数
+  22          返 回 值：无  
+  23          备    注：内部时钟11.0592MHz
+  24          ************************************************/
+  25          void Delayus(unsigned int us)
+  26          {
+  27   1          while( us--)
+  28   1          {
+  29   2            _nop_(); 
+  30   2          }             
+  31   1      }
+  32          /***********************************************
+  33          函数名称：Delay_ms
+  34          功    能：STC 1T单片机1ms延时程序
+  35          入口参数：ms:延时的毫秒数
+  36          返 回 值：无  
+  37          备    注：示波器实测1.05ms 内部时钟11.0592MHz
+  38          ************************************************/
+  39          void Delayms(unsigned int ms)
+  40          {
+  41   1          unsigned int i;
+  42   1          while( (ms--) != 0)
+  43   1          {
+  44   2            for(i = 0; i < 600; i++); 
+  45   2          }             
+  46   1      }
+  47          /*************************************
+  48          * 函 数 名: LCD1602_WriteCMD
+  49          * 函数功能: 向lcd1602写指令
+  50          * 入口参数: cmd:指令
+  51          * 返    回: 无
+  52          * 备    注：无
+  53          **************************************/
+  54          void LCD1602_WriteCMD(unsigned char cmd)
+  55          {
+C51 COMPILER V9.52.0.0   LCD_1602                                                          08/22/2019 11:35:34 PAGE 2   
+
+  56   1          EN=0;
+  57   1          RS=0;
+  58   1          RW=0;
+  59   1          Delayus(10);
+  60   1          EN=1; 
+  61   1          Delayus(10);
+  62   1          DataPort=cmd;
+  63   1          Delayus(10);
+  64   1          EN=0;
+  65   1      }
+  66          /***********************************************
+  67          函数名称：LCD1602_WriteDAT
+  68          功    能：向lcd1602写数据
+  69          入口参数：dat：数据
+  70          返 回 值：无  
+  71          备    注：无
+  72          ************************************************/
+  73          void LCD1602_WriteDAT(unsigned char dat)
+  74          {
+  75   1          EN=0;
+  76   1          RS=1;
+  77   1          RW=0;
+  78   1          Delayus(10);
+  79   1          EN=1; 
+  80   1          Delayus(10);
+  81   1          DataPort=dat;
+  82   1          Delayus(10);
+  83   1          EN=0;
+  84   1      }
+  85          /***********************************************
+  86          函数名称：LCD1602_CheckBusy
+  87          功    能：检测lcd1602忙信号
+  88          入口参数：无
+  89          返 回 值：无  
+  90          备    注：无
+  91          ************************************************/
+  92          void LCD1602_CheckBusy(void)
+  93          {
+  94   1          unsigned char temp;
+  95   1        DataPort=0xff;      //做输入先置高,12c系列单片机需转换端口模式
+  96   1          while(1)
+  97   1          {    
+  98   2            EN=0;        
+  99   2            RS=0;
+ 100   2            RW=1;
+ 101   2            Delayus(10);
+ 102   2            EN=1;
+ 103   2            Delayus(10);
+ 104   2            temp=DataPort;    //读取忙通道数据
+ 105   2            Delayus(10);
+ 106   2            EN=0;
+ 107   2            if((temp&0x80)!=0x80)
+ 108   2            {    
+ 109   3                break;
+ 110   3            }
+ 111   2          }
+ 112   1      }
+ 113           /***********************************************
+ 114          函数名称：LCD1602_Init
+ 115          功    能：LCD1602初始化
+ 116          入口参数：无
+ 117          返 回 值：无  
+C51 COMPILER V9.52.0.0   LCD_1602                                                          08/22/2019 11:35:34 PAGE 3   
+
+ 118          备    注：详见数据手册定义。
+ 119          ************************************************/
+ 120          void LCD1602_Init(void)  
+ 121          {
+ 122   1          Delayms(15);          //上电延时15ms
+ 123   1          LCD1602_WriteCMD(0x38); //写显示指令(不检测忙信号)
+ 124   1          Delayms(5);
+ 125   1          LCD1602_WriteCMD(0x38); //写显示指令(不检测忙信号)
+ 126   1          Delayms(5);
+ 127   1          LCD1602_WriteCMD(0x38); //写显示指令(不检测忙信号)
+ 128   1          LCD1602_CheckBusy();
+ 129   1          LCD1602_WriteCMD(0x38); //写显示指令
+ 130   1          LCD1602_CheckBusy();
+ 131   1          LCD1602_WriteCMD(0x08); //显示关闭
+ 132   1          LCD1602_CheckBusy();
+ 133   1          LCD1602_WriteCMD(0x01); //清屏
+ 134   1          LCD1602_CheckBusy();
+ 135   1          LCD1602_WriteCMD(0x06); //显示光标移动设置
+ 136   1          LCD1602_CheckBusy();
+ 137   1          LCD1602_WriteCMD(0x0c); //显示开及光标设置  
+ 138   1      }
+ 139           /***********************************************
+ 140          函数名称：LCD1602_Display
+ 141          功    能：写多字节字符
+ 142          入口参数：addr起始地址，pointer指针地址，index下标，num个数
+ 143          返 回 值：无  
+ 144          备    注：无
+ 145          ************************************************/
+ 146          void LCD1602_Display(unsigned char addr,unsigned char* pointer,unsigned char index,unsigned char num)
+ 147          {
+ 148   1          unsigned char i;
+ 149   1          LCD1602_CheckBusy();  //判断忙信号
+ 150   1          LCD1602_WriteCMD(addr); //写入地址
+ 151   1          for(i=0;i<num;i++)    //写入数据
+ 152   1          {
+ 153   2            LCD1602_CheckBusy();         //判断忙信号
+ 154   2            LCD1602_WriteDAT(pointer[index+i]);//写入数据     
+ 155   2          }
+ 156   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    219    ----
+   CONSTANT SIZE    =     56    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     10       7
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

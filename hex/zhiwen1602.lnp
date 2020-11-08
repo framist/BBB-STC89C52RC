@@ -1,0 +1,9 @@
+".\hex\delay.obj",
+".\hex\FPM10A.obj",
+".\hex\key.obj",
+".\hex\main.obj",
+".\hex\uart.obj",
+".\hex\buzz.obj",
+".\hex\lcd_1602.obj" 
+TO ".\hex\zhiwen1602" 
+PRINT(".\zhiwen1602.m51") RAMSIZE(256) 

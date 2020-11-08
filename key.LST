@@ -1,0 +1,33 @@
+C51 COMPILER V9.52.0.0   KEY                                                               08/22/2019 11:35:33 PAGE 1   
+
+
+C51 COMPILER V9.52.0.0, COMPILATION OF MODULE KEY
+OBJECT MODULE PLACED IN .\hex\key.obj
+COMPILER INVOKED BY: D:\Keil\C51\BIN\C51.EXE key.c BROWSE DEBUG OBJECTEXTEND TABS(2) OBJECT(.\hex\key.obj)
+
+line level    source
+
+   1          #include"key.h"
+   2          #include<reg52.h>
+   3          
+   4          void Key_Init(void)
+   5          {
+   6   1          //定义按键输入端口
+   7   1        KEY_DOWN=1;
+   8   1        KEY_OK=1;
+   9   1        KEY_CANCEL=1;
+  10   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =      7    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

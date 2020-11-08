@@ -1,0 +1,8 @@
+"delay.obj",
+"FPM10A.obj",
+"key.obj",
+"lcd_12864.obj",
+"main.obj",
+"uart.obj" 
+TO "my_work" 
+RAMSIZE(256) 

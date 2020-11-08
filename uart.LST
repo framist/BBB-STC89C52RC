@@ -1,0 +1,57 @@
+C51 COMPILER V9.52.0.0   UART                                                              08/22/2019 11:35:33 PAGE 1   
+
+
+C51 COMPILER V9.52.0.0, COMPILATION OF MODULE UART
+OBJECT MODULE PLACED IN .\hex\uart.obj
+COMPILER INVOKED BY: D:\Keil\C51\BIN\C51.EXE uart.c BROWSE DEBUG OBJECTEXTEND TABS(2) OBJECT(.\hex\uart.obj)
+
+line level    source
+
+   1          #include"uart.h"
+   2          #include<reg52.h>
+   3          
+   4          void Uart_Init(void)
+   5          {
+   6   1        PCON |= 0x80;   //使能波特率倍速位SMOD
+   7   1        SCON = 0x50;    //8位数据,可变波特率
+   8   1      //  AUXR &= 0xBF;   //定时器1时钟为Fosc/12,即12T
+   9   1      //  AUXR &= 0xFE;   //串口1选择定时器1为波特率发生器
+  10   1      //  TMOD &= 0x0F;   //清除定时器1模式位
+  11   1        TMOD |= 0x20;   //设定定时器1为8位自动重装方式
+  12   1        TL1 = 0xFF;   //设定定时初值
+  13   1        TH1 = 0xFF;   //设定定时器重装值
+  14   1        ET1 = 0;    //禁止定时器1中断
+  15   1        TR1 = 1;    //启动定时器1
+  16   1        EA=1;
+  17   1      }
+  18          
+  19          
+  20          void Uart_Send_Byte(unsigned char c)//UART Send a byte
+  21          {
+  22   1        SBUF = c;
+  23   1        while(!TI);   //发送完为1 
+  24   1        TI = 0;
+  25   1      }
+  26          
+  27          unsigned char Uart_Receive_Byte()//UART Receive a byteg
+  28          { 
+  29   1        unsigned char dat;
+  30   1        while(!RI);  //接收完为1 
+  31   1        RI = 0;
+  32   1        dat = SBUF;
+  33   1        return (dat);
+  34   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     38    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

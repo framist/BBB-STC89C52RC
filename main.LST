@@ -1,0 +1,101 @@
+C51 COMPILER V9.52.0.0   MAIN                                                              09/09/2019 16:29:47 PAGE 1   
+
+
+C51 COMPILER V9.52.0.0, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN .\hex\main.obj
+COMPILER INVOKED BY: D:\Keil\C51\BIN\C51.EXE main.c BROWSE DEBUG OBJECTEXTEND TABS(2) OBJECT(.\hex\main.obj)
+
+line level    source
+
+   1          #include<reg52.h>
+   2          #include<intrins.h>
+   3          #include"buzz.h"
+   4          #include"key.h"
+   5          #include"uart.h"
+   6          #include"delay.h"
+   7          #include"FPM10A.h"
+   8          #include"lcd_1602.h"
+   9          
+  10          
+  11          
+  12          void main()
+  13          {             
+  14   1        LCD1602_Init();     //初始化液晶
+  15   1        LCD1602_Display(0x80,"Fingerprint Test",0,16);   //液晶开机显示界面
+  16   1        Uart_Init();      //初始化串口
+  17   1        Key_Init();       //初始化按键
+  18   1        Delay_Ms(200);          //延时500MS，等待指纹模块复位
+  19   1        Device_Check();       //校对指纹模块是否接入正确，液晶做出相应的提示
+  20   1        Delay_Ms(1000);     //对接成功界面停留一定时间
+  21   1        while(1)
+  22   1        {
+  23   2            /**************进入主功能界面****************/
+  24   2          LCD1602_Display(0x80,"  search finger ",0,16);   //第一排显示搜索指纹
+  25   2          LCD1602_Display(0xc0,"  Add     delete",0,16);   //添加和删除指纹
+  26   2          if(local_date==0)
+  27   2          {
+  28   3            LCD1602_Display(0x80,  " *",0,2);
+  29   3            LCD1602_Display(0xc0,  "  ",0,2);
+  30   3            LCD1602_Display(0xc0+8,"  ",0,2); 
+  31   3          }
+  32   2          else if(local_date==1)
+  33   2          {
+  34   3            LCD1602_Display(0x80,  "  ",0,2);
+  35   3            LCD1602_Display(0xc0,  " *",0,2);
+  36   3            LCD1602_Display(0xc0+8,"  ",0,2); 
+  37   3          }
+  38   2          else if(local_date==2)
+  39   2          {
+  40   3            LCD1602_Display(0x80,  "  ",0,2);
+  41   3            LCD1602_Display(0xc0,  "  ",0,2);
+  42   3            LCD1602_Display(0xc0+8," *",0,2); 
+  43   3          }     
+  44   2          //确认键
+  45   2          if(KEY_OK == 0)
+  46   2          {  
+  47   3            while(KEY_OK == 0);//等待松开按键               
+  48   3            switch(local_date)
+  49   3            {
+  50   4                case 0:  //搜索指纹           
+  51   4                FPM10A_Find_Fingerprint();                                                
+  52   4                break;  
+  53   4                
+  54   4                case 1:  //添加指纹
+  55   4                FPM10A_Add_Fingerprint();
+C51 COMPILER V9.52.0.0   MAIN                                                              09/09/2019 16:29:47 PAGE 2   
+
+  56   4                break;          
+  57   4                
+  58   4                case 2: //清空指纹
+  59   4                FPM10A_Delete_All_Fingerprint();
+  60   4                  break;
+  61   4              }
+  62   3            }
+  63   2              //切换键
+  64   2            if(KEY_DOWN == 0)
+  65   2            {
+  66   3              while(KEY_DOWN == 0); //等待松开按键        
+  67   3                if(local_date<=2)
+  68   3              {
+  69   4                local_date++;
+  70   4                if(local_date==3)
+  71   4                  local_date=0;           
+  72   4              }   
+  73   3            }           
+  74   2            Delay_Ms(100); //延时判断100MS检测一次    
+  75   2        }
+  76   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    274    ----
+   CONSTANT SIZE    =     57    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
