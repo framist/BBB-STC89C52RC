@@ -14,5 +14,7 @@ void FPM10A_Add_Fingerprint();
 void FPM10A_Cmd_Reg_Model();
 void FPM10A_Cmd_Save_Finger( unsigned int storeID );
 void FINGERPRINT_Cmd_Delete_All_Finger(void);
-
+void FPM10A_Statistic();
+void FPM10A_Statistic_View();
+void FPM10A_Statistic_Delete();
 #endif

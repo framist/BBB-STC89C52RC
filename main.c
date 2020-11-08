@@ -10,7 +10,7 @@
 void main()
 {
 	LCD1602_Init();									  //初始化液晶
-	LCD1602_Display(0x80, "Fingerprint Test", 0, 16); //液晶开机显示界面
+	LCD1602_Display(0x80, "Drivers Checking", 0, 16); //液晶开机显示界面
 	Uart_Init();									  //初始化串口
 	Key_Init();										  //初始化按键
 	Delay_Ms(200);									  //延时500MS，等待指纹模块复位
@@ -19,25 +19,35 @@ void main()
 	while (1)
 	{
 		/**************进入主功能界面****************/
-		LCD1602_Display(0x80, "  search finger ", 0, 16); //第一排显示搜索指纹
-		LCD1602_Display(0xc0, "  Add     delete", 0, 16); //添加和删除指纹
+		LCD1602_Display(0x80, "  RUN     statis", 0, 16); //第一排显示搜索指纹
+		LCD1602_Display(0xc0, "  add     delete", 0, 16); //添加和删除指纹
 		if (local_date == 0)
 		{
-			LCD1602_Display(0x80, " *", 0, 2);
+			LCD1602_Display(0x80, "=>", 0, 2);
 			LCD1602_Display(0xc0, "  ", 0, 2);
 			LCD1602_Display(0xc0 + 8, "  ", 0, 2);
+			LCD1602_Display(0x80 + 8, "  ", 0, 2);
 		}
 		else if (local_date == 1)
 		{
 			LCD1602_Display(0x80, "  ", 0, 2);
-			LCD1602_Display(0xc0, " *", 0, 2);
+			LCD1602_Display(0xc0, "=>", 0, 2);
 			LCD1602_Display(0xc0 + 8, "  ", 0, 2);
+			LCD1602_Display(0x80 + 8, "  ", 0, 2);
 		}
 		else if (local_date == 2)
 		{
 			LCD1602_Display(0x80, "  ", 0, 2);
 			LCD1602_Display(0xc0, "  ", 0, 2);
-			LCD1602_Display(0xc0 + 8, " *", 0, 2);
+			LCD1602_Display(0xc0 + 8, "=>", 0, 2);
+			LCD1602_Display(0x80 + 8, "  ", 0, 2);
+		}
+		else if (local_date == 3)
+		{
+			LCD1602_Display(0x80, "  ", 0, 2);
+			LCD1602_Display(0xc0, "  ", 0, 2);
+			LCD1602_Display(0xc0 + 8, "  ", 0, 2);
+			LCD1602_Display(0x80 + 8, "=>", 0, 2);
 		}
 		//确认键
 		if (KEY_OK == 0)
@@ -57,6 +67,10 @@ void main()
 			case 2: //清空指纹
 				FPM10A_Delete_All_Fingerprint();
 				break;
+			
+			case 3: //统计功能
+				FPM10A_Statistic();
+				break;
 			}
 		}
 		//切换键
@@ -64,10 +78,10 @@ void main()
 		{
 			while (KEY_DOWN == 0)
 				; //等待松开按键
-			if (local_date <= 2)
+			if (local_date <= 3)
 			{
 				local_date++;
-				if (local_date == 3)
+				if (local_date == 4)
 					local_date = 0;
 			}
 		}
