@@ -17,4 +17,10 @@ void FINGERPRINT_Cmd_Delete_All_Finger(void);
 void FPM10A_Statistic();
 void FPM10A_Statistic_View();
 void FPM10A_Statistic_Delete();
+
+
+void SG90INIT();
+void SG90shutdown();
+
+
 #endif

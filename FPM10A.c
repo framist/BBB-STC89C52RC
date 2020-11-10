@@ -6,7 +6,42 @@
 #include "delay.h"
 #include "buzz.h"
 
-sbit SRD = P3 ^ 7; //继电器 
+sbit SG_PWM = P3^7; //舵机脉冲输出端
+//变量
+unsigned char PWM_count = 20; //pwm高电平时间   初始为1.5ms   舵机转动90°
+unsigned int count = 0;		 //延时中断计数
+
+void SG90INIT() //SG90初始化
+{
+
+	TMOD = 0x22; //定时器0 方式2
+	TH0 = 156;	 //100us定时
+	TL0 = 156;
+	EA = 1; //中断开启
+	ET0 = 1;
+	TR0 = 1; //开始计数
+}
+void SG90shutdown() //SG90关闭
+{
+	TR0 = 0;
+	// EA = 0; //中断关闭
+
+}
+void timer0() interrupt 1 //100us 中断
+{
+	if (count <= PWM_count) //脉冲高电平时间
+	{
+		SG_PWM = 1;
+	}
+	else //脉冲时基-高电平=低电平时间
+	{
+		SG_PWM = 0;
+	}
+	count++;
+}
+
+
+// sbit SRD = P3 ^ 7; //继电器 
 volatile unsigned char FPM10A_RECEICE_BUFFER[32];
 unsigned int finger_id = 0;
 
@@ -302,6 +337,7 @@ void FPM10A_Find_Fingerprint()
 	unsigned int find_fingerid = 0;
 	unsigned char id_show[] = {0, 0, 0};
 	char iNumber = 0;
+	int i = 0;
 	do
 	{
 		LCD1602_Display(0x80, "fingerprint lock", 0, 16);
@@ -341,9 +377,31 @@ void FPM10A_Find_Fingerprint()
 				LCD1602_WriteDAT(numbers[iNumber].name);
 
 				//SRD输出操作
-				SRD = 0;
-				Delay_Ms(3000);
-				SRD = 1;
+
+				SG90INIT(); //舵机驱动
+				PWM_count = 5;
+				while (i++ < 6000)
+				{
+					if (count >= 190)
+						count = 0; //设置舵机脉冲时基 20ms
+				}
+				i = 0;
+				SG90shutdown();
+
+				Delay_Ms(1000);
+
+				SG90INIT(); //舵机驱动
+				PWM_count = 20;
+				while (i++ < 6000)
+				{
+					if (count >= 190)
+						count = 0; //设置舵机脉冲时基 20ms
+				}
+				i = 0;
+				SG90shutdown();
+				// SRD = 0;
+				// Delay_Ms(3000);
+				// SRD = 1;
 			}
 			else //没有找到
 			{
