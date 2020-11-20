@@ -6,10 +6,12 @@
 #include "delay.h"
 #include "buzz.h"
 
-sbit SG_PWM = P3^7; //舵机脉冲输出端
+#include "eeprom.h"
+
+sbit SG_PWM = P1 ^ 1; //舵机脉冲输出端
 //变量
 unsigned char PWM_count = 20; //pwm高电平时间   初始为1.5ms   舵机转动90°
-unsigned int count = 0;		 //延时中断计数
+unsigned int count = 0;		  //延时中断计数
 
 void SG90INIT() //SG90初始化
 {
@@ -41,17 +43,17 @@ void timer0() interrupt 1 //100us 中断
 }
 
 
-// sbit SRD = P3 ^ 7; //继电器 
+// sbit SRD = P3 ^ 7; //继电器
 volatile unsigned char FPM10A_RECEICE_BUFFER[32];
 unsigned int finger_id = 0;
 
 //统计数据的全局变量
 struct Numbers
 {
-	char name;
-	unsigned int times; // 0~65536
-	unsigned int fid_min;
-	unsigned int fid_max;
+	unsigned char name;
+	unsigned char times;
+	unsigned char fid_min;
+	unsigned char fid_max;
 } numbers[] = {
 	{'F', 0, 0, 19},
 	{'Y', 0, 20, 39},
@@ -60,6 +62,29 @@ struct Numbers
 	{'G', 0, 80, 999},
 };
 
+// flash操作
+void dataLoad()
+{
+	char i;
+	for (i = 0; i < 5; i++)
+	{
+		numbers[i].times = byte_read(0x2001 + i);
+	}
+
+}
+void dataStore()
+{
+	/*
+	STC用FLASH模拟出来的EEPROM的字节写功能只能将1变成0,而不能将0变成1，
+ 	只有扇区擦除后数据才是全1,
+	*/
+	char i;
+	SectorErase(0x2000);
+	for (i = 0; i < 5; i++)
+	{
+		byte_write(0x2001 + i, numbers[i].times);
+	}
+}
 //FINGERPRINT通信协议定义
 
 code unsigned char FPM10A_Get_Device[10] = {0x01, 0x00, 0x07, 0x13, 0x00, 0x00, 0x00, 0x00, 0x00, 0x1b};	   //口令验证
@@ -373,6 +398,8 @@ void FPM10A_Find_Fingerprint()
 						break;
 					}
 				}
+				dataStore();
+
 				LCD1602_WriteCMD(0x80 + 10);
 				LCD1602_WriteDAT(numbers[iNumber].name);
 
@@ -380,19 +407,19 @@ void FPM10A_Find_Fingerprint()
 
 				SG90INIT(); //舵机驱动
 				PWM_count = 5;
-				while (i++ < 6000)
+				while (i++ < 30000)
 				{
 					if (count >= 190)
 						count = 0; //设置舵机脉冲时基 20ms
 				}
 				i = 0;
-				SG90shutdown();
+				// SG90shutdown();
 
-				Delay_Ms(1000);
+				// Delay_Ms(1000);
 
-				SG90INIT(); //舵机驱动
+				// SG90INIT(); //舵机驱动
 				PWM_count = 20;
-				while (i++ < 6000)
+				while (i++ < 10000)
 				{
 					if (count >= 190)
 						count = 0; //设置舵机脉冲时基 20ms
@@ -589,6 +616,7 @@ void FPM10A_Statistic_Delete()
 				numbers[iNumber].times = 0;
 			}
 
+			dataStore();
 			LCD1602_Display(0x80, "S=== Delete === ", 0, 16);
 			LCD1602_Display(0xc0, "   All empty    ", 0, 16);
 			Buzz_Times(3);

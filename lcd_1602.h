@@ -8,10 +8,10 @@ extern unsigned char code *Main_Menu[];
 
 
 //LCD1602操作位定义
-#define 	DataPort  	P0
-sbit 		RS 			= P2^5;     //寄存器选择 0:指令寄存器 1:数据寄存器
-sbit 		RW 			= P2^6;     //读写控制 0：写  1：读
-sbit 		EN 			= P2^7;     //读写数据使能   0：停止 1：启动
+#define 	DataPort  	P2
+sbit 		RS 			= P3^5;     //寄存器选择 0:指令寄存器 1:数据寄存器
+sbit 		RW 			= P3^6;     //读写控制 0：写  1：读
+sbit 		EN 			= P3^7;     //读写数据使能   0：停止 1：启动
 
 //1602屏地址定义
 #define LINE1 0x80				   //第一行地址

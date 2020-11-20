@@ -2,7 +2,7 @@
 #define _BUZZ_H_
 #include<reg52.h>
 
-sbit buzz=P1^0;
+sbit buzz=P1^0; //蜂鸣器
 
 void Buzz_Times(unsigned char times);
 

@@ -22,5 +22,7 @@ void FPM10A_Statistic_Delete();
 void SG90INIT();
 void SG90shutdown();
 
+void dataLoad();
+void dataStore();
 
 #endif

@@ -6,7 +6,7 @@
 #include "delay.h"
 #include "FPM10A.h"
 #include "lcd_1602.h"
-
+#include "eeprom.h"
 void main()
 {
 	LCD1602_Init();									  //初始化液晶
@@ -15,6 +15,7 @@ void main()
 	Key_Init();										  //初始化按键
 	Delay_Ms(200);									  //延时500MS，等待指纹模块复位
 	Device_Check();									  //校对指纹模块是否接入正确，液晶做出相应的提示
+	dataLoad();										  //数据载入
 	Delay_Ms(1000);									  //对接成功界面停留一定时间
 	while (1)
 	{
@@ -67,7 +68,7 @@ void main()
 			case 2: //清空指纹
 				FPM10A_Delete_All_Fingerprint();
 				break;
-			
+
 			case 3: //统计功能
 				FPM10A_Statistic();
 				break;
