@@ -1,4 +1,7 @@
 
-*.LST
+*
 hex/*
-my_work*
+
+!my_work.uvproj
+!*.c
+!*.h
