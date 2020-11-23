@@ -24,5 +24,6 @@ void SG90shutdown();
 
 void dataLoad();
 void dataStore();
+sbit IOT_OPEN = P0 ^ 0; //P1^2 IoT控制开锁 输入端
 
 #endif

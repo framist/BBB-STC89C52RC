@@ -9,6 +9,7 @@
 #include "eeprom.h"
 
 sbit SG_PWM = P1 ^ 1; //舵机脉冲输出端
+
 //变量
 unsigned char PWM_count = 20; //pwm高电平时间   初始为1.5ms   舵机转动90°
 unsigned int count = 0;		  //延时中断计数
@@ -60,13 +61,14 @@ struct Numbers
 	{'H', 0, 40, 59},
 	{'L', 0, 60, 79},
 	{'G', 0, 80, 999},
+	{'I', 0, 0, 0}, // I ：远程开锁数据
 };
 
 // flash操作
 void dataLoad()
 {
 	char i;
-	for (i = 0; i < 5; i++)
+	for (i = 0; i <= 5; i++)
 	{
 		numbers[i].times = byte_read(0x2001 + i);
 	}
@@ -80,7 +82,7 @@ void dataStore()
 	*/
 	char i;
 	SectorErase(0x2000);
-	for (i = 0; i < 5; i++)
+	for (i = 0; i <= 5; i++)
 	{
 		byte_write(0x2001 + i, numbers[i].times);
 	}
@@ -365,6 +367,7 @@ void FPM10A_Find_Fingerprint()
 	int i = 0;
 	do
 	{
+		LCD1602_Init(); //热插拔LCD
 		LCD1602_Display(0x80, "fingerprint lock", 0, 16);
 		LCD1602_Display(0xc0, "   running ...  ", 0, 16);
 		FPM10A_Cmd_Get_Img(); //获得指纹图像
@@ -413,11 +416,7 @@ void FPM10A_Find_Fingerprint()
 						count = 0; //设置舵机脉冲时基 20ms
 				}
 				i = 0;
-				// SG90shutdown();
-
-				// Delay_Ms(1000);
-
-				// SG90INIT(); //舵机驱动
+				
 				PWM_count = 20;
 				while (i++ < 10000)
 				{
@@ -436,6 +435,34 @@ void FPM10A_Find_Fingerprint()
 				LCD1602_Display(0xc0, "                ", 0, 16);
 				Buzz_Times(3);
 			}
+		}
+		//IoT控制开锁
+		//
+		if (IOT_OPEN == 0)
+		{
+			LCD1602_Display(0x80, "IoT Remote Open!", 0, 16);
+			LCD1602_Display(0xc0, " hello Internet ", 0, 16);
+			Buzz_Times(2);
+			//SRD输出操作
+			SG90INIT(); //舵机驱动
+			PWM_count = 5;
+			while (i++ < 30000)
+			{
+				if (count >= 190)
+					count = 0; //设置舵机脉冲时基 20ms
+			}
+			i = 0;
+			PWM_count = 20;
+			while (i++ < 10000)
+			{
+				if (count >= 190)
+					count = 0; //设置舵机脉冲时基 20ms
+			}
+			i = 0;
+			SG90shutdown();
+			//记录统计
+			numbers[5].times++;
+			dataStore();
 		}
 	} while (KEY_CANCEL == 1);
 }
@@ -555,7 +582,7 @@ void FPM10A_Statistic_View()
 	LCD1602_Display(0x80, " S=== View ==== ", 0, 16);
 	LCD1602_Display(0xc0, "   loading...   ", 0, 16);
 
-	for (iNumber = 0; iNumber <= 4; iNumber++)
+	for (iNumber = 0; iNumber <= 5; iNumber++)
 	{
 		i += numbers[iNumber].times; //注意！ 这里可能溢出
 	}
@@ -584,7 +611,7 @@ void FPM10A_Statistic_View()
 		LCD1602_WriteDAT(i % 10 + 48);
 
 		Delay_Ms(1000);
-		if (iNumber++ == 4)
+		if (iNumber++ == 5)
 		{
 			iNumber = 0;
 		};
@@ -611,7 +638,7 @@ void FPM10A_Statistic_Delete()
 			LCD1602_Display(0x80, "S=== Delete === ", 0, 16);
 			LCD1602_Display(0xc0, "  deleting ...  ", 0, 16);
 
-			for (iNumber = 0; iNumber <= 4; iNumber++)
+			for (iNumber = 0; iNumber <= 5; iNumber++)
 			{
 				numbers[iNumber].times = 0;
 			}

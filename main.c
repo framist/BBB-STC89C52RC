@@ -13,6 +13,7 @@ void main()
 	LCD1602_Display(0x80, "Drivers Checking", 0, 16); //液晶开机显示界面
 	Uart_Init();									  //初始化串口
 	Key_Init();										  //初始化按键
+	IOT_OPEN = 1;
 	Delay_Ms(200);									  //延时500MS，等待指纹模块复位
 	Device_Check();									  //校对指纹模块是否接入正确，液晶做出相应的提示
 	dataLoad();										  //数据载入
