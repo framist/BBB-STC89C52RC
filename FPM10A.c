@@ -8,21 +8,21 @@
 
 #include "eeprom.h"
 
-sbit SG_PWM = P1 ^ 1; //舵机脉冲输出端
+sbit SG_PWM = P1 ^ 1;  //舵机脉冲输出端
 
 //变量
-unsigned char PWM_count = 20; //pwm高电平时间   初始为1.5ms   舵机转动90°
-unsigned int count = 0;		  //延时中断计数
+unsigned char PWM_count = 20;  //pwm高电平时间   初始为1.5ms   舵机转动90°
+unsigned int count      = 0;   //延时中断计数
 
 void SG90INIT() //SG90初始化
 {
 
-	TMOD = 0x22; //定时器0 方式2
-	TH0 = 156;	 //100us定时
-	TL0 = 156;
-	EA = 1; //中断开启
-	ET0 = 1;
-	TR0 = 1; //开始计数
+	TMOD = 0x22;  //定时器0 方式2
+	TH0  = 156;   //100us定时
+	TL0  = 156;
+	EA   = 1;     //中断开启
+	ET0  = 1;
+	TR0  = 1;     //开始计数
 }
 void SG90shutdown() //SG90关闭
 {
