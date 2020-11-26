@@ -4,7 +4,7 @@
 
 *此为BigBrotherBlueprint (BBB 老大哥计画) 的一部分*
 
-- [ ] ​	试试
+
 
 - [x] 指纹锁部分
 - [x] 热插拔屏幕
