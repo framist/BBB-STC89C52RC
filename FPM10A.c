@@ -308,7 +308,9 @@ void FPM10A_Add_Fingerprint()
 							FINGERPRINT_Cmd_Img_To_Buffer1();
 							FPM10A_Receive_Data(12);
 							LCD1602_Display(0x80, "Successful entry", 0, 16);
-							Buzz_Times(1);
+							Buzzer_Init();
+							Buzzer_UnlockSound(1);
+							
 							Delay_Ms(1000);
 							LCD1602_Display(0x80, " Please  finger ", 0, 16);
 							LCD1602_Display(0xc0, "     again      ", 0, 16);
@@ -339,7 +341,8 @@ void FPM10A_Add_Fingerprint()
 									FPM10A_Receive_Data(12);
 									FPM10A_Cmd_Save_Finger(finger_id);
 									FPM10A_Receive_Data(12);
-									Buzz_Times(1);
+									Buzzer_Init();
+									Buzzer_UnlockSound(1);
 									Delay_Ms(1000);
 									if (finger_id++ == numbers[iNumber].fid_max)
 									{
@@ -384,7 +387,8 @@ void FPM10A_Find_Fingerprint()
 			{
 				LCD1602_Display(0x80, " Hello ,      ! ", 0, 16);
 				LCD1602_Display(0xc0, "    ID is       ", 0, 16);
-				Buzz_Times(1);
+				Buzzer_Init();
+				Buzzer_UnlockSound(1);
 				//拼接指纹ID数
 				find_fingerid = FPM10A_RECEICE_BUFFER[10] * 256 + FPM10A_RECEICE_BUFFER[11];
 				//指纹iD值显示处理
@@ -433,7 +437,8 @@ void FPM10A_Find_Fingerprint()
 			{
 				LCD1602_Display(0x80, " Search  failed ", 0, 16);
 				LCD1602_Display(0xc0, "                ", 0, 16);
-				Buzz_Times(3);
+				Buzzer_Init();
+				Buzzer_UnlockSound(3);
 			}
 		}
 		//IoT控制开锁
@@ -442,7 +447,8 @@ void FPM10A_Find_Fingerprint()
 		{
 			LCD1602_Display(0x80, "IoT Remote Open!", 0, 16);
 			LCD1602_Display(0xc0, " hello Internet ", 0, 16);
-			Buzz_Times(2);
+			Buzzer_Init();
+			Buzzer_UnlockSound(2);
 			//SRD输出操作
 			SG90INIT(); //舵机驱动
 			PWM_count = 5;
@@ -491,7 +497,8 @@ void FPM10A_Delete_All_Fingerprint()
 			FPM10A_Receive_Data(12);
 			LCD1602_Display(0x80, "   All empty    ", 0, 16);
 			LCD1602_Display(0xc0, "                ", 0, 16);
-			Buzz_Times(3);
+			Buzzer_Init();
+			Buzzer_UnlockSound(3);
 			break;
 		}
 	} while (KEY_CANCEL == 1);
@@ -646,7 +653,8 @@ void FPM10A_Statistic_Delete()
 			dataStore();
 			LCD1602_Display(0x80, "S=== Delete === ", 0, 16);
 			LCD1602_Display(0xc0, "   All empty    ", 0, 16);
-			Buzz_Times(3);
+			Buzzer_Init();
+			Buzzer_UnlockSound(3);
 			break;
 		}
 	} while (KEY_CANCEL == 1);
