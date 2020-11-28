@@ -8,6 +8,8 @@
 
 #include "eeprom.h"
 
+#include "buzzer.h"
+
 sbit SG_PWM = P1 ^ 1;  //舵机脉冲输出端
 
 //变量
@@ -28,21 +30,26 @@ void SG90shutdown() //SG90关闭
 {
 	TR0 = 0;
 	// EA = 0; //中断关闭
-
 }
 void timer0() interrupt 1 //100us 中断
 {
-	if (count <= PWM_count) //脉冲高电平时间
-	{
-		SG_PWM = 1;
-	}
-	else //脉冲时基-高电平=低电平时间
-	{
-		SG_PWM = 0;
-	}
-	count++;
-}
 
+	if (IF_MUSIC_INTERRUPT == 0)
+	{
+		if (count <= PWM_count) //脉冲高电平时间
+		{
+			SG_PWM = 1;
+		}
+		else //脉冲时基-高电平=低电平时间
+		{
+			SG_PWM = 0;
+		}
+		count++;
+	}else{
+		T0_int();
+		
+	}
+}
 
 // sbit SRD = P3 ^ 7; //继电器
 volatile unsigned char FPM10A_RECEICE_BUFFER[32];
@@ -310,7 +317,7 @@ void FPM10A_Add_Fingerprint()
 							LCD1602_Display(0x80, "Successful entry", 0, 16);
 							Buzzer_Init();
 							Buzzer_UnlockSound(1);
-							
+							IF_MUSIC_INTERRUPT = 0;
 							Delay_Ms(1000);
 							LCD1602_Display(0x80, " Please  finger ", 0, 16);
 							LCD1602_Display(0xc0, "     again      ", 0, 16);
@@ -343,6 +350,7 @@ void FPM10A_Add_Fingerprint()
 									FPM10A_Receive_Data(12);
 									Buzzer_Init();
 									Buzzer_UnlockSound(1);
+									IF_MUSIC_INTERRUPT = 0;
 									Delay_Ms(1000);
 									if (finger_id++ == numbers[iNumber].fid_max)
 									{
@@ -387,8 +395,7 @@ void FPM10A_Find_Fingerprint()
 			{
 				LCD1602_Display(0x80, " Hello ,      ! ", 0, 16);
 				LCD1602_Display(0xc0, "    ID is       ", 0, 16);
-				Buzzer_Init();
-				Buzzer_UnlockSound(1);
+				
 				//拼接指纹ID数
 				find_fingerid = FPM10A_RECEICE_BUFFER[10] * 256 + FPM10A_RECEICE_BUFFER[11];
 				//指纹iD值显示处理
@@ -409,7 +416,16 @@ void FPM10A_Find_Fingerprint()
 
 				LCD1602_WriteCMD(0x80 + 10);
 				LCD1602_WriteDAT(numbers[iNumber].name);
-
+				//区别是否是访客
+				if(numbers[iNumber].name != 'G'){
+					Buzzer_Init();
+					Buzzer_UnlockSound(1);
+					IF_MUSIC_INTERRUPT = 0;
+				}else{
+					Buzzer_Init();
+					Buzzer_Sound_Music_Guest();
+					IF_MUSIC_INTERRUPT = 0;
+				}
 				//SRD输出操作
 
 				SG90INIT(); //舵机驱动
@@ -439,6 +455,7 @@ void FPM10A_Find_Fingerprint()
 				LCD1602_Display(0xc0, "                ", 0, 16);
 				Buzzer_Init();
 				Buzzer_UnlockSound(3);
+				IF_MUSIC_INTERRUPT = 0;
 			}
 		}
 		//IoT控制开锁
@@ -449,6 +466,7 @@ void FPM10A_Find_Fingerprint()
 			LCD1602_Display(0xc0, " hello Internet ", 0, 16);
 			Buzzer_Init();
 			Buzzer_UnlockSound(2);
+			IF_MUSIC_INTERRUPT = 0;
 			//SRD输出操作
 			SG90INIT(); //舵机驱动
 			PWM_count = 5;
@@ -499,6 +517,7 @@ void FPM10A_Delete_All_Fingerprint()
 			LCD1602_Display(0xc0, "                ", 0, 16);
 			Buzzer_Init();
 			Buzzer_UnlockSound(3);
+			IF_MUSIC_INTERRUPT = 0;
 			break;
 		}
 	} while (KEY_CANCEL == 1);
@@ -655,6 +674,7 @@ void FPM10A_Statistic_Delete()
 			LCD1602_Display(0xc0, "   All empty    ", 0, 16);
 			Buzzer_Init();
 			Buzzer_UnlockSound(3);
+			IF_MUSIC_INTERRUPT = 0;
 			break;
 		}
 	} while (KEY_CANCEL == 1);
