@@ -80,7 +80,7 @@ void Buzzer_UnlockSound(int count){
 	return;
 }
 /*******访客进入buzzer_Guest sound*************/
-void Buzzer_Sound(uchar music[][2]){
+void Buzzer_Play_Music(uchar music[][2]){
 		  
 		uchar i=0; //定义无符号字符型变量i,初始值为0	
 		while(1){
@@ -118,8 +118,3 @@ void Buzzer_Sound(uchar music[][2]){
 		}
 }
 
-void Buzzer_Sound_Music_Guest()
-{
-	// Buzzer_Sound(Music_Guest);
-	Buzzer_Sound(music);
-}

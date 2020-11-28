@@ -423,7 +423,7 @@ void FPM10A_Find_Fingerprint()
 					IF_MUSIC_INTERRUPT = 0;
 				}else{
 					Buzzer_Init();
-					Buzzer_Sound_Music_Guest();
+					Buzzer_Play_Music(Music_Guest);
 					IF_MUSIC_INTERRUPT = 0;
 				}
 				//SRDÊä³ö²Ù×÷
