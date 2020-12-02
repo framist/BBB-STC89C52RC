@@ -639,7 +639,9 @@ void FPM10A_Statistic_View()
 		if (iNumber == 1)
 		{
 			if(KEY_OK == 0){
+				Buzzer_Init();
 				Buzzer_Play_Music(Blue_And_White);
+				IF_MUSIC_INTERRUPT = 0;
 			}
 		};
 
