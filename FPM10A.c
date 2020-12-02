@@ -419,6 +419,7 @@ void FPM10A_Find_Fingerprint()
 				
 				Buzzer_Init();
 				Buzzer_UnlockSound(1);
+				IF_MUSIC_INTERRUPT = 0;
 
 				SG90INIT(); //舵机驱动
 				PWM_count = 5;
@@ -441,9 +442,6 @@ void FPM10A_Find_Fingerprint()
 
 				//区别是否是访客
 				if(numbers[iNumber].name != 'G'){
-					Buzzer_Init();
-					Buzzer_UnlockSound(1);
-					IF_MUSIC_INTERRUPT = 0;
 				}else{
 					Buzzer_Init();
 					Buzzer_Play_Music(Music_Guest_Short);
@@ -637,7 +635,7 @@ void FPM10A_Statistic_View()
 		LCD1602_WriteDAT(i % 1000 / 100 + 48);
 		LCD1602_WriteDAT(i % 100 / 10 + 48);
 		LCD1602_WriteDAT(i % 10 + 48);
-		
+
 		if (iNumber == 1)
 		{
 			if(KEY_OK == 0){

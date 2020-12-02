@@ -9,8 +9,9 @@ extern uchar m,n;
 extern uchar code T[49][2];
 extern uchar code music[][2];
 extern uchar code Music_Guest[][2];
-extern uchar code Music_Guest_short[][2];
-
+extern uchar code Music_Guest_Short[][2];
+extern uchar code Music_Guest_Long[][2];
+extern uchar code Blue_And_White[][2];
 sbit beepIO=P1^0; //定义蜂鸣器端口为p1^0
 
 
