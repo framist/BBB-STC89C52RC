@@ -417,7 +417,8 @@ void FPM10A_Find_Fingerprint()
 				LCD1602_WriteCMD(0x80 + 10);
 				LCD1602_WriteDAT(numbers[iNumber].name);
 				
-
+				Buzzer_Init();
+				Buzzer_UnlockSound(1);
 
 				SG90INIT(); //¶æ»úÇý¶¯
 				PWM_count = 5;
@@ -445,7 +446,7 @@ void FPM10A_Find_Fingerprint()
 					IF_MUSIC_INTERRUPT = 0;
 				}else{
 					Buzzer_Init();
-					Buzzer_Play_Music(Music_Guest);
+					Buzzer_Play_Music(Music_Guest_Short);
 					IF_MUSIC_INTERRUPT = 0;
 				}
 				
@@ -636,8 +637,15 @@ void FPM10A_Statistic_View()
 		LCD1602_WriteDAT(i % 1000 / 100 + 48);
 		LCD1602_WriteDAT(i % 100 / 10 + 48);
 		LCD1602_WriteDAT(i % 10 + 48);
+		
+		if (iNumber == 1)
+		{
+			if(KEY_OK == 0){
+				Buzzer_Play_Music(Blue_And_White);
+			}
+		};
 
-		Delay_Ms(1000);
+		Delay_Ms(2000);
 		if (iNumber++ == 5)
 		{
 			iNumber = 0;
